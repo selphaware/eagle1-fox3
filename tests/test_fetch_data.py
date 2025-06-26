@@ -8,7 +8,7 @@ from unittest.mock import patch, MagicMock
 
 # Import the functions, not the module, to avoid actual API calls during import
 with patch('yfinance.Ticker'):
-    from data.fetch_data import validate_ticker, get_financials, get_13f_holdings, get_mutual_fund_holdings
+    from data.fetch_data import validate_ticker, get_financials, get_13f_holdings, get_mutual_fund_holdings, get_corporate_actions
 
 if TYPE_CHECKING:
     from _pytest.capture import CaptureFixture
@@ -412,6 +412,180 @@ class TestGetMutualFundHoldings:
         
         # Test
         result = get_mutual_fund_holdings('AAPL')
+        
+        # Assertions
+        assert result.empty
+        mock_validate.assert_called_once_with('AAPL')
+        mock_ticker.assert_called_once_with('AAPL')
+
+
+class TestGetCorporateActions:
+    """Tests for the get_corporate_actions function."""
+    
+    def test_get_corporate_actions_with_invalid_input(self) -> None:
+        """Test that get_corporate_actions raises TypeError for non-string inputs."""
+        with pytest.raises(TypeError):
+            get_corporate_actions(123)  # type: ignore
+    
+    @patch('data.fetch_data.validate_ticker')
+    def test_get_corporate_actions_with_invalid_ticker(self, mock_validate: MagicMock) -> None:
+        """Test that get_corporate_actions returns empty DataFrame for invalid tickers."""
+        # Setup mock
+        mock_validate.return_value = False
+        
+        # Test
+        result = get_corporate_actions('INVALID')
+        
+        # Assertions
+        assert result.empty
+        mock_validate.assert_called_once_with('INVALID')
+    
+    @patch('yfinance.Ticker')
+    @patch('data.fetch_data.validate_ticker')
+    def test_get_corporate_actions_with_valid_ticker_dividends_only(self, mock_validate: MagicMock, mock_ticker: MagicMock) -> None:
+        """Test that get_corporate_actions returns dividend data when only dividends are available."""
+        import pandas as pd
+        import numpy as np
+        
+        # Setup mocks
+        mock_validate.return_value = True
+        
+        # Create mock dividends Series
+        dates = pd.DatetimeIndex(['2022-12-01', '2022-09-01', '2022-06-01', '2022-03-01'])
+        dividends = pd.Series([0.23, 0.23, 0.23, 0.22], index=dates)
+        
+        # Create empty splits Series
+        splits = pd.Series(dtype='float64')
+        
+        # Setup mock ticker instance
+        mock_ticker_instance = MagicMock()
+        mock_ticker_instance.dividends = dividends
+        mock_ticker_instance.splits = splits
+        mock_ticker.return_value = mock_ticker_instance
+        
+        # Test
+        result = get_corporate_actions('AAPL')
+        
+        # Assertions
+        assert not result.empty
+        assert 'Date' in result.columns
+        assert 'Dividend' in result.columns
+        assert 'Action' in result.columns
+        assert 'Ticker' in result.columns
+        assert len(result) == 4  # 4 dividend entries
+        assert (result['Action'] == 'Dividend').all()
+        mock_validate.assert_called_once_with('AAPL')
+        mock_ticker.assert_called_once_with('AAPL')
+    
+    @patch('yfinance.Ticker')
+    @patch('data.fetch_data.validate_ticker')
+    def test_get_corporate_actions_with_valid_ticker_splits_only(self, mock_validate: MagicMock, mock_ticker: MagicMock) -> None:
+        """Test that get_corporate_actions returns split data when only splits are available."""
+        import pandas as pd
+        
+        # Setup mocks
+        mock_validate.return_value = True
+        
+        # Create empty dividends Series
+        dividends = pd.Series(dtype='float64')
+        
+        # Create mock splits Series
+        dates = pd.DatetimeIndex(['2020-08-31', '2014-06-09', '2005-02-28'])
+        splits = pd.Series([4.0, 7.0, 2.0], index=dates)  # 4:1, 7:1, 2:1 splits
+        
+        # Setup mock ticker instance
+        mock_ticker_instance = MagicMock()
+        mock_ticker_instance.dividends = dividends
+        mock_ticker_instance.splits = splits
+        mock_ticker.return_value = mock_ticker_instance
+        
+        # Test
+        result = get_corporate_actions('AAPL')
+        
+        # Assertions
+        assert not result.empty
+        assert 'Date' in result.columns
+        assert 'Split Ratio' in result.columns
+        assert 'Action' in result.columns
+        assert 'Ticker' in result.columns
+        assert len(result) == 3  # 3 split entries
+        assert (result['Action'] == 'Stock Split').all()
+        mock_validate.assert_called_once_with('AAPL')
+        mock_ticker.assert_called_once_with('AAPL')
+    
+    @patch('yfinance.Ticker')
+    @patch('data.fetch_data.validate_ticker')
+    def test_get_corporate_actions_with_valid_ticker_both_actions(self, mock_validate: MagicMock, mock_ticker: MagicMock) -> None:
+        """Test that get_corporate_actions returns both dividend and split data when both are available."""
+        import pandas as pd
+        
+        # Setup mocks
+        mock_validate.return_value = True
+        
+        # Create mock dividends Series
+        div_dates = pd.DatetimeIndex(['2022-12-01', '2022-09-01'])
+        dividends = pd.Series([0.23, 0.23], index=div_dates)
+        
+        # Create mock splits Series
+        split_dates = pd.DatetimeIndex(['2020-08-31', '2014-06-09'])
+        splits = pd.Series([4.0, 7.0], index=split_dates)
+        
+        # Setup mock ticker instance
+        mock_ticker_instance = MagicMock()
+        mock_ticker_instance.dividends = dividends
+        mock_ticker_instance.splits = splits
+        mock_ticker.return_value = mock_ticker_instance
+        
+        # Test
+        result = get_corporate_actions('AAPL')
+        
+        # Assertions
+        assert not result.empty
+        assert 'Date' in result.columns
+        assert 'Action' in result.columns
+        assert 'Ticker' in result.columns
+        assert len(result) == 4  # 2 dividend + 2 split entries
+        assert sum(result['Action'] == 'Dividend') == 2
+        assert sum(result['Action'] == 'Stock Split') == 2
+        mock_validate.assert_called_once_with('AAPL')
+        mock_ticker.assert_called_once_with('AAPL')
+    
+    @patch('yfinance.Ticker')
+    @patch('data.fetch_data.validate_ticker')
+    def test_get_corporate_actions_with_empty_response(self, mock_validate: MagicMock, mock_ticker: MagicMock) -> None:
+        """Test that get_corporate_actions handles empty responses gracefully."""
+        import pandas as pd
+        
+        # Setup mocks
+        mock_validate.return_value = True
+        
+        # Create empty Series
+        empty_series = pd.Series(dtype='float64')
+        
+        # Setup mock ticker instance
+        mock_ticker_instance = MagicMock()
+        mock_ticker_instance.dividends = empty_series
+        mock_ticker_instance.splits = empty_series
+        mock_ticker.return_value = mock_ticker_instance
+        
+        # Test
+        result = get_corporate_actions('AAPL')
+        
+        # Assertions
+        assert result.empty
+        mock_validate.assert_called_once_with('AAPL')
+        mock_ticker.assert_called_once_with('AAPL')
+    
+    @patch('yfinance.Ticker')
+    @patch('data.fetch_data.validate_ticker')
+    def test_get_corporate_actions_with_exception(self, mock_validate: MagicMock, mock_ticker: MagicMock) -> None:
+        """Test that get_corporate_actions handles exceptions gracefully."""
+        # Setup mocks
+        mock_validate.return_value = True
+        mock_ticker.side_effect = Exception("API Error")
+        
+        # Test
+        result = get_corporate_actions('AAPL')
         
         # Assertions
         assert result.empty

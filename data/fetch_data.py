@@ -241,16 +241,79 @@ def get_mutual_fund_holdings(ticker: str) -> pd.DataFrame:
 
 def get_corporate_actions(ticker: str) -> pd.DataFrame:
     """
-    Fetch corporate actions (dividends, splits, etc.).
+    Fetch corporate actions (dividends, splits, etc.) for a given ticker.
     
     Args:
         ticker: The ticker symbol to fetch data for.
         
     Returns:
         DataFrame: Corporate actions data for the specified ticker.
+        Empty DataFrame if ticker is invalid or data cannot be fetched.
+        The DataFrame contains dividends and stock splits information.
+    
+    Raises:
+        TypeError: If ticker is not a string.
     """
-    # Placeholder implementation
-    pass
+    if not isinstance(ticker, str):
+        logger.error("TypeError: ticker must be a string")
+        raise TypeError("ticker must be a string")
+    
+    if not validate_ticker(ticker):
+        logger.warning(f"Invalid ticker: {ticker}. Returning empty DataFrame")
+        return pd.DataFrame()
+    
+    try:
+        logger.info(f"Fetching corporate actions data for {ticker}")
+        ticker_obj = yf.Ticker(ticker)
+        
+        # Get dividends
+        dividends = ticker_obj.dividends
+        if not isinstance(dividends, pd.Series) or dividends.empty:
+            logger.warning(f"No dividend data available for {ticker}")
+            dividends = pd.Series(dtype='float64')
+        
+        # Get stock splits
+        splits = ticker_obj.splits
+        if not isinstance(splits, pd.Series) or splits.empty:
+            logger.warning(f"No stock split data available for {ticker}")
+            splits = pd.Series(dtype='float64')
+        
+        # If both are empty, return empty DataFrame
+        if dividends.empty and splits.empty:
+            logger.warning(f"No corporate actions data available for {ticker}")
+            return pd.DataFrame()
+        
+        # Create DataFrames from Series
+        actions_data = {}
+        
+        if not dividends.empty:
+            # Convert dividends Series to DataFrame
+            div_df = dividends.reset_index()
+            div_df.columns = ['Date', 'Dividend']
+            div_df['Action'] = 'Dividend'
+            div_df['Ticker'] = ticker
+            actions_data['dividends'] = div_df
+        
+        if not splits.empty:
+            # Convert splits Series to DataFrame
+            split_df = splits.reset_index()
+            split_df.columns = ['Date', 'Split Ratio']
+            split_df['Action'] = 'Stock Split'
+            split_df['Ticker'] = ticker
+            actions_data['splits'] = split_df
+        
+        # Combine the DataFrames
+        if actions_data:
+            result = pd.concat(actions_data.values(), ignore_index=True)
+            result = result.sort_values('Date', ascending=False).reset_index(drop=True)
+            logger.info(f"Successfully fetched corporate actions data for {ticker}")
+            return result
+        else:
+            return pd.DataFrame()
+            
+    except Exception as e:
+        logger.error(f"Error fetching corporate actions data for {ticker}: {str(e)}")
+        return pd.DataFrame()
 
 
 def retry_api_call(func):

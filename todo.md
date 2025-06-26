@@ -36,11 +36,11 @@ The following indexed checklist breaks the original PRD into very small, code-re
   - [x] Unit test: Test with invalid ticker
   - [x] Unit test: Test with empty response
   - [x] Unit test: Test exception handling
-- [ ] 2.1.5 `get_corporate_actions(ticker) -> DataFrame`
-  - [ ] Unit test: Test with valid ticker
-  - [ ] Unit test: Test with invalid ticker
-  - [ ] Unit test: Test with empty response
-  - [ ] Unit test: Test exception handling
+- [x] 2.1.5 `get_corporate_actions(ticker) -> DataFrame`
+  - [x] Unit test: Test with valid ticker
+  - [x] Unit test: Test with invalid ticker
+  - [x] Unit test: Test with empty response
+  - [x] Unit test: Test exception handling
 - [ ] 2.1.6 `retry_api_call(func)` decorator
   - [ ] Unit test: Test successful execution
   - [ ] Unit test: Test with retries needed
