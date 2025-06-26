@@ -108,9 +108,82 @@ def get_13f_holdings(ticker: str) -> pd.DataFrame:
         
     Returns:
         DataFrame: 13F/13D holdings data for the specified ticker.
+        Empty DataFrame if ticker is invalid or data cannot be fetched.
+    
+    Raises:
+        TypeError: If ticker is not a string.
     """
-    # Placeholder implementation
-    pass
+    if not isinstance(ticker, str):
+        logger.error("TypeError: ticker must be a string")
+        raise TypeError("ticker must be a string")
+    
+    if not validate_ticker(ticker):
+        logger.warning(f"Invalid ticker: {ticker}. Returning empty DataFrame")
+        return pd.DataFrame()
+    
+    try:
+        logger.info(f"Fetching 13F holdings data for {ticker}")
+        ticker_obj = yf.Ticker(ticker)
+        
+        # Get institutional holders (13F filers)
+        institutional_holders = ticker_obj.institutional_holders
+        
+        # Get major holders (includes 13D filers)
+        major_holders = ticker_obj.major_holders
+        
+        # Check if we got any data
+        if institutional_holders is None or institutional_holders.empty:
+            logger.warning(f"No institutional holders data available for {ticker}")
+            institutional_holders = pd.DataFrame()
+            
+        if major_holders is None or major_holders.empty:
+            logger.warning(f"No major holders data available for {ticker}")
+            major_holders = pd.DataFrame()
+        
+        # If both are empty, return empty DataFrame
+        if institutional_holders.empty and (major_holders is None or major_holders.empty):
+            logger.warning(f"No 13F/13D holdings data available for {ticker}")
+            return pd.DataFrame()
+        
+        # Process and return the institutional holders data
+        # This contains the most detailed 13F information
+        if not institutional_holders.empty:
+            # Add ticker column for reference
+            institutional_holders['Ticker'] = ticker
+            
+            # Convert date column to datetime if it exists
+            if 'Date Reported' in institutional_holders.columns:
+                institutional_holders['Date Reported'] = pd.to_datetime(
+                    institutional_holders['Date Reported']
+                )
+                
+            logger.info(f"Successfully fetched 13F holdings data for {ticker}")
+            return institutional_holders
+        else:
+            # If no institutional data but we have major holders
+            # Convert major_holders to a proper DataFrame with column names
+            if not (major_holders is None or major_holders.empty):
+                # Major holders is often returned in a strange format
+                # We need to reshape it into a more usable form
+                try:
+                    # Try to create a meaningful DataFrame from major_holders
+                    holders_df = pd.DataFrame({
+                        'Holder Type': major_holders.iloc[:, 0],
+                        'Percentage': major_holders.iloc[:, 1]
+                    })
+                    holders_df['Ticker'] = ticker
+                    
+                    logger.info(f"Successfully fetched major holders data for {ticker}")
+                    return holders_df
+                except Exception as e:
+                    logger.error(f"Error processing major holders data: {str(e)}")
+                    return pd.DataFrame()
+            
+            return pd.DataFrame()
+    
+    except Exception as e:
+        logger.error(f"Error fetching 13F/13D holdings data for {ticker}: {str(e)}")
+        return pd.DataFrame()
 
 
 def get_mutual_fund_holdings(ticker: str) -> pd.DataFrame:
