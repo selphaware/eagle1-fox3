@@ -10,9 +10,9 @@ The following indexed checklist breaks the original PRD into very small, code-re
 - [x] 0.5 Add project root README (updated existing README)
 
 ## 1. Directory Skeleton
-- [ ] 1.1 Create folders: `/data`, `/ml`, `/frontend`, `/tests`
-- [ ] 1.2 Add empty `__init__.py` in every package
-- [ ] 1.3 Commit empty placeholder modules
+- [x] 1.1 Create folders: `/data`, `/ml`, `/frontend`, `/tests`
+- [x] 1.2 Add empty `__init__.py` in every package
+- [x] 1.3 Commit empty placeholder modules
 
 ## 2. Data Layer
 ### 2.1 Fetching (`data/fetch_data.py`)
