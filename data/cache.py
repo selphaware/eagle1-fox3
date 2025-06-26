@@ -1,5 +1,7 @@
 """Module for caching financial data to reduce API calls."""
 
+__author__ = "Usman Ahmad"
+
 from typing import Dict, Optional, Union, Any
 import os
 import pickle

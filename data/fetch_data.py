@@ -1,5 +1,7 @@
 """Module for fetching financial data from Yahoo Finance."""
 
+__author__ = "Usman Ahmad"
+
 from typing import Dict, List, Optional, Union
 import logging
 import pandas as pd

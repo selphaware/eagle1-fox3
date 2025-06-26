@@ -3,6 +3,8 @@
 
 Real-time concurrent data extraction + TensorFlow analysis on Yahoo Finance data.
 
+By Usman Ahmad
+
 ## Overview
 
 This Python Dash web application enables users to:

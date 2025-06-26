@@ -1,5 +1,7 @@
 """Module for preprocessing financial data."""
 
+__author__ = "Usman Ahmad"
+
 from typing import Dict, List, Optional, Union, Literal
 import pandas as pd
 from sklearn.preprocessing import StandardScaler

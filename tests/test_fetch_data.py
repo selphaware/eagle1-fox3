@@ -1,5 +1,7 @@
 """Tests for the fetch_data module."""
 
+__author__ = "Usman Ahmad"
+
 from typing import TYPE_CHECKING, Any, Dict
 import pytest
 from unittest.mock import patch, MagicMock
