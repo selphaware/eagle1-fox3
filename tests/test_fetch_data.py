@@ -8,7 +8,7 @@ from unittest.mock import patch, MagicMock
 
 # Import the functions, not the module, to avoid actual API calls during import
 with patch('yfinance.Ticker'):
-    from data.fetch_data import validate_ticker, get_financials, get_13f_holdings, get_mutual_fund_holdings, get_corporate_actions
+    from data.fetch_data import validate_ticker, get_financials, get_13f_holdings, get_mutual_fund_holdings, get_corporate_actions, retry_api_call
 
 if TYPE_CHECKING:
     from _pytest.capture import CaptureFixture
@@ -591,3 +591,66 @@ class TestGetCorporateActions:
         assert result.empty
         mock_validate.assert_called_once_with('AAPL')
         mock_ticker.assert_called_once_with('AAPL')
+
+
+class TestRetryApiCall:
+    """Tests for the retry_api_call decorator."""
+    
+    def test_successful_execution(self) -> None:
+        """Test that the decorator works with successful function execution."""
+        # Define a test function
+        @retry_api_call
+        def test_func(value: str) -> str:
+            return f"Success: {value}"
+        
+        # Test
+        result = test_func("test")
+        
+        # Assertions
+        assert result == "Success: test"
+    
+    @patch('time.sleep')  # Mock sleep to speed up tests
+    def test_with_retries_needed(self, mock_sleep: MagicMock) -> None:
+        """Test that the decorator retries when exceptions are raised."""
+        # Setup counter for tracking calls
+        call_count = 0
+        
+        # Define a test function that fails twice then succeeds
+        @retry_api_call
+        def test_func() -> str:
+            nonlocal call_count
+            call_count += 1
+            if call_count < 3:  # Fail on first two calls
+                raise ConnectionError("API Connection Error")
+            return "Success after retries"
+        
+        # Test
+        result = test_func()
+        
+        # Assertions
+        assert result == "Success after retries"
+        assert call_count == 3  # Function should be called 3 times (2 failures + 1 success)
+        assert mock_sleep.call_count == 2  # Sleep should be called twice (after each failure)
+        # Verify exponential backoff
+        mock_sleep.assert_any_call(1)  # First retry: 1 second
+        mock_sleep.assert_any_call(2)  # Second retry: 2 seconds
+    
+    @patch('time.sleep')  # Mock sleep to speed up tests
+    def test_max_retries_exceeded(self, mock_sleep: MagicMock) -> None:
+        """Test that the decorator raises the exception after max retries."""
+        # Define a test function that always fails
+        @retry_api_call
+        def test_func() -> None:
+            raise ValueError("API Error")
+        
+        # Test
+        with pytest.raises(ValueError, match="API Error"):
+            test_func()
+        
+        # Assertions
+        # MAX_RETRIES is 3, so sleep should be called 3 times
+        assert mock_sleep.call_count == 3
+        # Verify exponential backoff
+        mock_sleep.assert_any_call(1)  # First retry: 1 second
+        mock_sleep.assert_any_call(2)  # Second retry: 2 seconds
+        mock_sleep.assert_any_call(4)  # Third retry: 4 seconds

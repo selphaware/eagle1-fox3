@@ -41,10 +41,10 @@ The following indexed checklist breaks the original PRD into very small, code-re
   - [x] Unit test: Test with invalid ticker
   - [x] Unit test: Test with empty response
   - [x] Unit test: Test exception handling
-- [ ] 2.1.6 `retry_api_call(func)` decorator
-  - [ ] Unit test: Test successful execution
-  - [ ] Unit test: Test with retries needed
-  - [ ] Unit test: Test max retries exceeded
+- [x] 2.1.6 `retry_api_call(func)` decorator
+  - [x] Unit test: Test successful execution
+  - [x] Unit test: Test with retries needed
+  - [x] Unit test: Test max retries exceeded
 
 ### 2.2 Caching (`data/cache.py`)
 - [ ] 2.2.1 `save_to_cache(key, df)`

@@ -2,7 +2,7 @@
 
 __author__ = "Usman Ahmad"
 
-from typing import Dict, List, Optional, Union
+from typing import Any, Callable, Dict, List, Optional, Union
 import logging
 import pandas as pd
 import yfinance as yf
@@ -316,15 +316,61 @@ def get_corporate_actions(ticker: str) -> pd.DataFrame:
         return pd.DataFrame()
 
 
-def retry_api_call(func):
+def retry_api_call(func: Callable[..., Any]) -> Callable[..., Any]:
     """
     Decorator to retry API calls with exponential backoff.
+    
+    This decorator will retry the decorated function if it raises an exception,
+    with an exponential backoff delay between retries. It will retry up to
+    MAX_RETRIES times before giving up.
     
     Args:
         func: The function to decorate.
         
     Returns:
         The decorated function with retry logic.
+        
+    Example:
+        @retry_api_call
+        def fetch_data(ticker):
+            # API call that might fail
+            return yf.Ticker(ticker).info
     """
-    # Placeholder implementation
-    pass
+    import time
+    from functools import wraps
+    
+    MAX_RETRIES = 3
+    BASE_DELAY = 1  # seconds
+    
+    @wraps(func)
+    def wrapper(*args: Any, **kwargs: Any) -> Any:
+        retries = 0
+        last_exception = None
+        
+        while retries <= MAX_RETRIES:
+            try:
+                if retries > 0:
+                    logger.warning(
+                        f"Retry {retries}/{MAX_RETRIES} for {func.__name__} with args {args} and kwargs {kwargs}"
+                    )
+                return func(*args, **kwargs)
+            except Exception as e:
+                last_exception = e
+                retries += 1
+                
+                if retries <= MAX_RETRIES:
+                    # Calculate exponential backoff delay: 1s, 2s, 4s, ...
+                    delay = BASE_DELAY * (2 ** (retries - 1))
+                    logger.warning(
+                        f"Exception in {func.__name__}: {str(e)}. "
+                        f"Retrying in {delay} seconds... ({retries}/{MAX_RETRIES})"
+                    )
+                    time.sleep(delay)
+                else:
+                    logger.error(
+                        f"Max retries ({MAX_RETRIES}) exceeded for {func.__name__}. "
+                        f"Last exception: {str(e)}"
+                    )
+                    raise last_exception
+    
+    return wrapper
