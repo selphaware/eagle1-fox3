@@ -190,16 +190,53 @@ def get_13f_holdings(ticker: str) -> pd.DataFrame:
 
 def get_mutual_fund_holdings(ticker: str) -> pd.DataFrame:
     """
-    Fetch mutual fund holdings.
+    Fetch mutual fund holdings data for a given ticker.
     
     Args:
         ticker: The ticker symbol to fetch data for.
         
     Returns:
         DataFrame: Mutual fund holdings data for the specified ticker.
+        Empty DataFrame if ticker is invalid or data cannot be fetched.
+    
+    Raises:
+        TypeError: If ticker is not a string.
     """
-    # Placeholder implementation
-    pass
+    if not isinstance(ticker, str):
+        logger.error("TypeError: ticker must be a string")
+        raise TypeError("ticker must be a string")
+    
+    if not validate_ticker(ticker):
+        logger.warning(f"Invalid ticker: {ticker}. Returning empty DataFrame")
+        return pd.DataFrame()
+    
+    try:
+        logger.info(f"Fetching mutual fund holdings data for {ticker}")
+        ticker_obj = yf.Ticker(ticker)
+        
+        # Get mutual fund holders
+        mutual_fund_holders = ticker_obj.mutualfund_holders
+        
+        # Check if we got any data
+        if mutual_fund_holders is None or mutual_fund_holders.empty:
+            logger.warning(f"No mutual fund holdings data available for {ticker}")
+            return pd.DataFrame()
+        
+        # Add ticker column for reference
+        mutual_fund_holders['Ticker'] = ticker
+        
+        # Convert date column to datetime if it exists
+        if 'Date Reported' in mutual_fund_holders.columns:
+            mutual_fund_holders['Date Reported'] = pd.to_datetime(
+                mutual_fund_holders['Date Reported']
+            )
+        
+        logger.info(f"Successfully fetched mutual fund holdings data for {ticker}")
+        return mutual_fund_holders
+        
+    except Exception as e:
+        logger.error(f"Error fetching mutual fund holdings data for {ticker}: {str(e)}")
+        return pd.DataFrame()
 
 
 def get_corporate_actions(ticker: str) -> pd.DataFrame:

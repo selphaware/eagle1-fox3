@@ -8,7 +8,7 @@ from unittest.mock import patch, MagicMock
 
 # Import the functions, not the module, to avoid actual API calls during import
 with patch('yfinance.Ticker'):
-    from data.fetch_data import validate_ticker, get_financials, get_13f_holdings
+    from data.fetch_data import validate_ticker, get_financials, get_13f_holdings, get_mutual_fund_holdings
 
 if TYPE_CHECKING:
     from _pytest.capture import CaptureFixture
@@ -315,6 +315,103 @@ class TestGet13FHoldings:
         
         # Test
         result = get_13f_holdings('AAPL')
+        
+        # Assertions
+        assert result.empty
+        mock_validate.assert_called_once_with('AAPL')
+        mock_ticker.assert_called_once_with('AAPL')
+
+
+class TestGetMutualFundHoldings:
+    """Tests for the get_mutual_fund_holdings function."""
+    
+    def test_get_mutual_fund_holdings_with_invalid_input(self) -> None:
+        """Test that get_mutual_fund_holdings raises TypeError for non-string inputs."""
+        with pytest.raises(TypeError):
+            get_mutual_fund_holdings(123)  # type: ignore
+    
+    @patch('data.fetch_data.validate_ticker')
+    def test_get_mutual_fund_holdings_with_invalid_ticker(self, mock_validate: MagicMock) -> None:
+        """Test that get_mutual_fund_holdings returns empty DataFrame for invalid tickers."""
+        # Setup mock
+        mock_validate.return_value = False
+        
+        # Test
+        result = get_mutual_fund_holdings('INVALID')
+        
+        # Assertions
+        assert result.empty
+        mock_validate.assert_called_once_with('INVALID')
+    
+    @patch('yfinance.Ticker')
+    @patch('data.fetch_data.validate_ticker')
+    def test_get_mutual_fund_holdings_with_valid_ticker(self, mock_validate: MagicMock, mock_ticker: MagicMock) -> None:
+        """Test that get_mutual_fund_holdings returns mutual fund holders data for valid tickers."""
+        import pandas as pd
+        
+        # Setup mocks
+        mock_validate.return_value = True
+        
+        # Create mock mutual fund holders data
+        mock_mf_holders = pd.DataFrame({
+            'Holder': ['Vanguard Total Stock Market Index Fund', 'Vanguard 500 Index Fund'],
+            'Shares': [120000000, 110000000],
+            'Date Reported': ['2022-12-31', '2022-12-31'],
+            'Value': [18000000000, 16500000000],
+            '% Out': [0.0755, 0.0692]
+        })
+        
+        # Setup mock ticker instance
+        mock_ticker_instance = MagicMock()
+        mock_ticker_instance.mutualfund_holders = mock_mf_holders
+        mock_ticker.return_value = mock_ticker_instance
+        
+        # Test
+        result = get_mutual_fund_holdings('AAPL')
+        
+        # Assertions
+        assert not result.empty
+        assert 'Holder' in result.columns
+        assert 'Shares' in result.columns
+        assert 'Ticker' in result.columns  # We add this column in our implementation
+        mock_validate.assert_called_once_with('AAPL')
+        mock_ticker.assert_called_once_with('AAPL')
+    
+    @patch('yfinance.Ticker')
+    @patch('data.fetch_data.validate_ticker')
+    def test_get_mutual_fund_holdings_with_empty_response(self, mock_validate: MagicMock, mock_ticker: MagicMock) -> None:
+        """Test that get_mutual_fund_holdings handles empty responses gracefully."""
+        import pandas as pd
+        
+        # Setup mocks
+        mock_validate.return_value = True
+        
+        # Create empty DataFrame
+        empty_df = pd.DataFrame()
+        
+        # Setup mock ticker instance
+        mock_ticker_instance = MagicMock()
+        mock_ticker_instance.mutualfund_holders = empty_df
+        mock_ticker.return_value = mock_ticker_instance
+        
+        # Test
+        result = get_mutual_fund_holdings('AAPL')
+        
+        # Assertions
+        assert result.empty
+        mock_validate.assert_called_once_with('AAPL')
+        mock_ticker.assert_called_once_with('AAPL')
+    
+    @patch('yfinance.Ticker')
+    @patch('data.fetch_data.validate_ticker')
+    def test_get_mutual_fund_holdings_with_exception(self, mock_validate: MagicMock, mock_ticker: MagicMock) -> None:
+        """Test that get_mutual_fund_holdings handles exceptions gracefully."""
+        # Setup mocks
+        mock_validate.return_value = True
+        mock_ticker.side_effect = Exception("API Error")
+        
+        # Test
+        result = get_mutual_fund_holdings('AAPL')
         
         # Assertions
         assert result.empty
