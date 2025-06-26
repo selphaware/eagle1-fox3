@@ -1,8 +1,12 @@
 """Module for fetching financial data from Yahoo Finance."""
 
 from typing import Dict, List, Optional, Union
+import logging
 import pandas as pd
 import yfinance as yf
+
+# Configure logging
+logger = logging.getLogger(__name__)
 
 
 def validate_ticker(ticker: str) -> bool:
@@ -15,8 +19,24 @@ def validate_ticker(ticker: str) -> bool:
     Returns:
         bool: True if the ticker is valid, False otherwise.
     """
-    # Placeholder implementation
-    pass
+    if not isinstance(ticker, str) or not ticker.strip():
+        logger.error("Invalid ticker format: ticker must be a non-empty string")
+        return False
+    
+    try:
+        ticker_obj = yf.Ticker(ticker)
+        info = ticker_obj.info
+        
+        # Check if we got valid info back (if 'regularMarketPrice' exists, it's likely valid)
+        if info and 'regularMarketPrice' in info and info['regularMarketPrice'] is not None:
+            logger.info(f"Ticker {ticker} validated successfully")
+            return True
+        else:
+            logger.warning(f"Ticker {ticker} not found or returned incomplete data")
+            return False
+    except Exception as e:
+        logger.error(f"Error validating ticker {ticker}: {str(e)}")
+        return False
 
 
 def get_financials(ticker: str) -> pd.DataFrame:

@@ -1,4 +1,5 @@
-# Financial Data Analysis Application
+# Eagle1-Fox3
+## Financial Data Analysis Application
 
 Real-time concurrent data extraction + TensorFlow analysis on Yahoo Finance data.
 
@@ -33,7 +34,7 @@ This Python Dash web application enables users to:
    ```
    # Windows
    .\env_eaglefox\Scripts\activate
-   
+
    # Unix/MacOS
    source env_eaglefox/bin/activate
    ```
