@@ -21,11 +21,11 @@ The following indexed checklist breaks the original PRD into very small, code-re
   - [x] Unit test: Test with valid ticker
   - [x] Unit test: Test with invalid ticker
   - [x] Unit test: Test exception handling
-- [ ] 2.1.2 `get_financials(ticker) -> DataFrame`
-  - [ ] Unit test: Test with valid ticker
-  - [ ] Unit test: Test with invalid ticker
-  - [ ] Unit test: Test with empty response
-  - [ ] Unit test: Test exception handling
+- [x] 2.1.2 `get_financials(ticker) -> DataFrame`
+  - [x] Unit test: Test with valid ticker
+  - [x] Unit test: Test with invalid ticker
+  - [x] Unit test: Test with empty response
+  - [x] Unit test: Test exception handling
 - [ ] 2.1.3 `get_13f_holdings(ticker) -> DataFrame`
   - [ ] Unit test: Test with valid ticker
   - [ ] Unit test: Test with invalid ticker
