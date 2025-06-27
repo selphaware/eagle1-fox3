@@ -80,10 +80,10 @@ The following indexed checklist breaks the original PRD into very small, code-re
   - [x] Unit test: Test with valid inputs
   - [x] Unit test: Test with different test sizes
   - [x] Unit test: Test with stratification
-- [ ] 4.2 Metric helper functions
-  - [ ] Unit test: Test classification metrics
-  - [ ] Unit test: Test regression metrics
-  - [ ] Unit test: Test with edge cases
+- [x] 4.2 Metric helper functions
+  - [x] Unit test: Test classification metrics
+  - [x] Unit test: Test regression metrics
+  - [x] Unit test: Test with edge cases
 
 ## 5. Classification (`ml/classification.py`)
 - [ ] 5.1 Logistic Regression model

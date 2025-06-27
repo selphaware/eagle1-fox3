@@ -14,9 +14,19 @@ import logging
 
 # Import functionality from submodules
 from ml.data_splitting import split_data
+from ml.metrics import (
+    classification_metrics,
+    regression_metrics,
+    get_feature_importance
+)
 
 # Configure logging
 logger = logging.getLogger(__name__)
 
 # Re-export functions for easier imports
-__all__ = ['split_data']
+__all__ = [
+    'split_data',
+    'classification_metrics',
+    'regression_metrics',
+    'get_feature_importance'
+]
