@@ -19,6 +19,7 @@ from ml.metrics import (
     regression_metrics,
     get_feature_importance
 )
+from ml.classification import LogisticRegressionModel
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -28,5 +29,6 @@ __all__ = [
     'split_data',
     'classification_metrics',
     'regression_metrics',
-    'get_feature_importance'
+    'get_feature_importance',
+    'LogisticRegressionModel'
 ]

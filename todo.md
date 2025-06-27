@@ -86,10 +86,10 @@ The following indexed checklist breaks the original PRD into very small, code-re
   - [x] Unit test: Test with edge cases
 
 ## 5. Classification (`ml/classification.py`)
-- [ ] 5.1 Logistic Regression model
-  - [ ] Unit test: Test model training
-  - [ ] Unit test: Test model prediction
-  - [ ] Unit test: Test model evaluation
+- [x] 5.1 Logistic Regression model
+  - [x] Unit test: Test model training
+  - [x] Unit test: Test model prediction
+  - [x] Unit test: Test model evaluation
 - [ ] 5.2 Random Forest Classifier
   - [ ] Unit test: Test model training
   - [ ] Unit test: Test model prediction
