@@ -7,7 +7,7 @@ import pandas as pd
 import numpy as np
 from typing import TYPE_CHECKING
 
-from data.preprocess import impute_missing, scale_numeric
+from data.preprocess import impute_missing, scale_numeric, encode_categorical
 
 if TYPE_CHECKING:
     from _pytest.capture import CaptureFixture
@@ -242,3 +242,114 @@ class TestScaleNumeric:
         
         # Verify constant column has zeros (sklearn's StandardScaler behavior)
         assert (result['B'] == 0).all()  # All values should be 0
+
+
+class TestEncodeCategorical:
+    """Tests for the encode_categorical function."""
+    
+    def test_encode_categorical_with_invalid_df_type(self) -> None:
+        """Test that encode_categorical raises TypeError for invalid DataFrame type."""
+        with pytest.raises(TypeError, match="df must be a pandas DataFrame"):
+            encode_categorical([1, 2, 3])  # type: ignore
+        
+        with pytest.raises(TypeError, match="df must be a pandas DataFrame"):
+            encode_categorical({"a": 1, "b": 2})  # type: ignore
+    
+    def test_encode_categorical_with_categorical_columns(self) -> None:
+        """Test that encode_categorical correctly encodes categorical columns."""
+        # Create test DataFrame with categorical columns
+        df = pd.DataFrame({
+            'A': ['cat', 'dog', 'cat', 'bird'],
+            'B': ['red', 'blue', 'green', 'blue']
+        })
+        
+        # Call function
+        result = encode_categorical(df)
+        
+        # Verify result
+        assert 'A' not in result.columns  # Original column should be removed
+        assert 'B' not in result.columns  # Original column should be removed
+        
+        # Check that we have binary columns for each category
+        assert 'A_cat' in result.columns
+        assert 'A_dog' in result.columns
+        assert 'A_bird' in result.columns
+        assert 'B_red' in result.columns
+        assert 'B_blue' in result.columns
+        assert 'B_green' in result.columns
+        
+        # Check that the encoding is correct (1 for matching category, 0 otherwise)
+        assert result.loc[0, 'A_cat'] == 1  # First row has 'cat' in column A
+        assert result.loc[0, 'A_dog'] == 0  # First row doesn't have 'dog' in column A
+        assert result.loc[1, 'B_blue'] == 1  # Second row has 'blue' in column B
+        assert result.loc[2, 'B_green'] == 1  # Third row has 'green' in column B
+    
+    def test_encode_categorical_with_mixed_columns(self) -> None:
+        """Test that encode_categorical only encodes categorical columns and leaves others unchanged."""
+        # Create test DataFrame with mixed column types
+        df = pd.DataFrame({
+            'A': ['cat', 'dog', 'cat', 'bird'],  # Categorical
+            'B': [1.0, 2.0, 3.0, 4.0]           # Numeric
+        })
+        
+        # Call function
+        result = encode_categorical(df)
+        
+        # Verify categorical column was encoded
+        assert 'A' not in result.columns  # Original column should be removed
+        assert 'A_cat' in result.columns
+        assert 'A_dog' in result.columns
+        assert 'A_bird' in result.columns
+        
+        # Verify numeric column was left unchanged
+        assert 'B' in result.columns
+        pd.testing.assert_series_equal(result['B'], df['B'])
+    
+    def test_encode_categorical_with_empty_dataframe(self) -> None:
+        """Test that encode_categorical raises ValueError for empty DataFrame."""
+        # Create empty DataFrame
+        df = pd.DataFrame()
+        
+        # Test with empty DataFrame
+        with pytest.raises(ValueError, match="No categorical columns found for encoding"):
+            encode_categorical(df)
+    
+    def test_encode_categorical_with_no_categorical_columns(self) -> None:
+        """Test that encode_categorical raises ValueError when no categorical columns."""
+        # Create DataFrame with only numeric columns
+        df = pd.DataFrame({
+            'A': [1.0, 2.0, 3.0, 4.0],
+            'B': [5.0, 6.0, 7.0, 8.0]
+        })
+        
+        # Test with no categorical columns
+        with pytest.raises(ValueError, match="No categorical columns found for encoding"):
+            encode_categorical(df)
+    
+    def test_encode_categorical_with_boolean_column(self) -> None:
+        """Test that encode_categorical correctly encodes boolean columns."""
+        # Create DataFrame with boolean column
+        df = pd.DataFrame({
+            'A': [True, False, True, False],
+            'B': ['x', 'y', 'x', 'z']
+        })
+        
+        # Call function
+        result = encode_categorical(df)
+        
+        # Verify boolean column was encoded
+        assert 'A' not in result.columns
+        assert 'A_True' in result.columns
+        assert 'A_False' in result.columns
+        
+        # Check encoding is correct
+        assert result.loc[0, 'A_True'] == 1
+        assert result.loc[0, 'A_False'] == 0
+        assert result.loc[1, 'A_True'] == 0
+        assert result.loc[1, 'A_False'] == 1
+        
+        # Verify other categorical column was also encoded
+        assert 'B' not in result.columns
+        assert 'B_x' in result.columns
+        assert 'B_y' in result.columns
+        assert 'B_z' in result.columns

@@ -70,10 +70,10 @@ The following indexed checklist breaks the original PRD into very small, code-re
   - [x] Unit test: Test with numeric columns
   - [x] Unit test: Test with mixed columns
   - [x] Unit test: Test with empty DataFrame
-- [ ] 3.3 `encode_categorical(df)`
-  - [ ] Unit test: Test with categorical columns
-  - [ ] Unit test: Test with mixed columns
-  - [ ] Unit test: Test with empty DataFrame
+- [x] 3.3 `encode_categorical(df)`
+  - [x] Unit test: Test with categorical columns
+  - [x] Unit test: Test with mixed columns
+  - [x] Unit test: Test with empty DataFrame
 
 ## 4. ML Helpers (`ml/base.py`)
 - [ ] 4.1 `split_data(df, target, test_size=0.2)`
