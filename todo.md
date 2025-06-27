@@ -61,11 +61,11 @@ The following indexed checklist breaks the original PRD into very small, code-re
   - [x] Unit test: Test with non-existent cache
 
 ## 3. Preprocessing (`data/preprocess.py`)
-- [ ] 3.1 `impute_missing(df, method="mean")`
-  - [ ] Unit test: Test mean imputation
-  - [ ] Unit test: Test median imputation
-  - [ ] Unit test: Test drop imputation
-  - [ ] Unit test: Test with no missing values
+- [x] 3.1 `impute_missing(df, method="mean")`
+  - [x] Unit test: Test mean imputation
+  - [x] Unit test: Test median imputation
+  - [x] Unit test: Test drop imputation
+  - [x] Unit test: Test with no missing values
 - [ ] 3.2 `scale_numeric(df)`
   - [ ] Unit test: Test with numeric columns
   - [ ] Unit test: Test with mixed columns
