@@ -11,7 +11,7 @@ import pandas as pd
 from unittest.mock import patch, mock_open
 from typing import TYPE_CHECKING
 
-from data.cache import save_to_cache, load_from_cache
+from data.cache import save_to_cache, load_from_cache, is_cache_stale
 
 if TYPE_CHECKING:
     from _pytest.capture import CaptureFixture

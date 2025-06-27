@@ -137,6 +137,68 @@ def is_cache_stale(key: str, minutes: int = 60) -> bool:
     
     Returns:
         bool: True if cache is stale or doesn't exist, False otherwise.
+        
+    Raises:
+        ValueError: If key is empty or invalid, or if minutes is not a positive integer.
     """
-    # Placeholder implementation
-    pass
+    import logging
+    from datetime import datetime, timedelta
+    
+    # Configure logging
+    logger = logging.getLogger(__name__)
+    
+    # Validate inputs
+    if not isinstance(key, str) or not key.strip():
+        logger.error("Invalid key: key must be a non-empty string")
+        raise ValueError("Key must be a non-empty string")
+        
+    if not isinstance(minutes, int) or minutes <= 0:
+        logger.error(f"Invalid minutes value: {minutes}. Must be a positive integer")
+        raise ValueError("Minutes must be a positive integer")
+    
+    # Sanitize key for filename
+    safe_key = ''.join(c if c.isalnum() else '_' for c in key)
+    
+    # Get cache path
+    cache_dir = os.path.join(os.path.dirname(__file__), '..', 'cache')
+    cache_path = os.path.join(cache_dir, f"{safe_key}.pkl")
+    
+    # Check if cache file exists
+    if not os.path.exists(cache_path):
+        logger.info(f"No cache found for key '{key}'")
+        return True  # No cache means it's stale
+    
+    try:
+        # Load from pickle file
+        with open(cache_path, 'rb') as f:
+            cache_data = pickle.load(f)
+        
+        # Verify cache data structure
+        if not isinstance(cache_data, dict) or 'timestamp' not in cache_data:
+            logger.warning(f"Corrupted cache for key '{key}': missing timestamp")
+            return True  # Corrupted cache is considered stale
+        
+        # Get timestamp
+        timestamp = cache_data.get('timestamp')
+        if not isinstance(timestamp, datetime):
+            logger.warning(f"Corrupted cache for key '{key}': invalid timestamp type")
+            return True  # Invalid timestamp means it's stale
+        
+        # Check if cache is stale
+        current_time = datetime.now()
+        max_age = timedelta(minutes=minutes)
+        is_stale = (current_time - timestamp) > max_age
+        
+        if is_stale:
+            logger.info(f"Cache for key '{key}' is stale (older than {minutes} minutes)")
+        else:
+            logger.info(f"Cache for key '{key}' is fresh (less than {minutes} minutes old)")
+            
+        return is_stale
+        
+    except (pickle.UnpicklingError, EOFError) as e:
+        logger.warning(f"Corrupted cache file for key '{key}': {str(e)}")
+        return True  # Corrupted cache is considered stale
+    except Exception as e:
+        logger.error(f"Error checking cache staleness for key '{key}': {str(e)}")
+        return True  # Error means we should consider it stale
