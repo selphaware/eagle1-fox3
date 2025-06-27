@@ -47,10 +47,10 @@ The following indexed checklist breaks the original PRD into very small, code-re
   - [x] Unit test: Test max retries exceeded
 
 ### 2.2 Caching (`data/cache.py`)
-- [ ] 2.2.1 `save_to_cache(key, df)`
-  - [ ] Unit test: Test successful save
-  - [ ] Unit test: Test with invalid inputs
-  - [ ] Unit test: Test with file system errors
+- [x] 2.2.1 `save_to_cache(key, df)`
+  - [x] Unit test: Test successful save
+  - [x] Unit test: Test with invalid inputs
+  - [x] Unit test: Test with file system errors
 - [ ] 2.2.2 `load_from_cache(key) -> DataFrame | None`
   - [ ] Unit test: Test successful load
   - [ ] Unit test: Test with non-existent key
