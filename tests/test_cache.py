@@ -11,7 +11,7 @@ import pandas as pd
 from unittest.mock import patch, mock_open
 from typing import TYPE_CHECKING
 
-from data.cache import save_to_cache
+from data.cache import save_to_cache, load_from_cache
 
 if TYPE_CHECKING:
     from _pytest.capture import CaptureFixture
@@ -122,3 +122,111 @@ class TestSaveToCache:
         # Test
         with pytest.raises(OSError, match="Failed to save data to cache"):
             save_to_cache(key, df)
+
+
+class TestLoadFromCache:
+    """Tests for the load_from_cache function."""
+    
+    def test_load_from_cache_with_invalid_key(self) -> None:
+        """Test that load_from_cache raises ValueError for invalid keys."""
+        with pytest.raises(ValueError, match="Key must be a non-empty string"):
+            load_from_cache("")
+        
+        with pytest.raises(ValueError, match="Key must be a non-empty string"):
+            load_from_cache("   ")
+        
+        with pytest.raises(ValueError, match="Key must be a non-empty string"):
+            load_from_cache(123)  # type: ignore
+    
+    def test_load_from_cache_with_nonexistent_key(self, cleanup_cache: None) -> None:
+        """Test that load_from_cache returns None for non-existent keys."""
+        # Test with a key that doesn't exist
+        result = load_from_cache("nonexistent_key")
+        assert result is None
+    
+    def test_load_from_cache_with_valid_key(self, cleanup_cache: None) -> None:
+        """Test that load_from_cache successfully loads cached data."""
+        # First save some data to cache
+        key = "test_load_key"
+        df = pd.DataFrame({'A': [1, 2, 3], 'B': ['a', 'b', 'c']})
+        save_to_cache(key, df)
+        
+        # Then try to load it
+        result = load_from_cache(key)
+        
+        # Verify result
+        assert result is not None
+        pd.testing.assert_frame_equal(result, df)
+    
+    @patch('os.path.exists')
+    @patch('builtins.open', new_callable=mock_open)
+    @patch('pickle.load')
+    def test_load_from_cache_with_corrupted_structure(
+        self, mock_load: pytest.MonkeyPatch, mock_file: pytest.MonkeyPatch, mock_exists: pytest.MonkeyPatch
+    ) -> None:
+        """Test that load_from_cache handles corrupted cache structure."""
+        # Setup mocks
+        mock_exists.return_value = True
+        mock_load.return_value = {"wrong_key": "wrong_value"}  # Missing required keys
+        
+        # Test
+        result = load_from_cache("corrupted_key")
+        
+        # Verify result
+        assert result is None
+        mock_exists.assert_called_once()
+        mock_file.assert_called_once()
+        mock_load.assert_called_once()
+    
+    @patch('os.path.exists')
+    @patch('builtins.open', new_callable=mock_open)
+    @patch('pickle.load')
+    def test_load_from_cache_with_invalid_data_type(
+        self, mock_load: pytest.MonkeyPatch, mock_file: pytest.MonkeyPatch, mock_exists: pytest.MonkeyPatch
+    ) -> None:
+        """Test that load_from_cache handles invalid data type in cache."""
+        # Setup mocks
+        mock_exists.return_value = True
+        mock_load.return_value = {
+            "timestamp": datetime.now(),
+            "data": [1, 2, 3]  # Not a DataFrame
+        }
+        
+        # Test
+        result = load_from_cache("invalid_data_key")
+        
+        # Verify result
+        assert result is None
+    
+    @patch('os.path.exists')
+    @patch('builtins.open', new_callable=mock_open)
+    @patch('pickle.load')
+    def test_load_from_cache_with_unpickling_error(
+        self, mock_load: pytest.MonkeyPatch, mock_file: pytest.MonkeyPatch, mock_exists: pytest.MonkeyPatch
+    ) -> None:
+        """Test that load_from_cache handles pickle unpickling errors."""
+        # Setup mocks
+        mock_exists.return_value = True
+        mock_load.side_effect = pickle.UnpicklingError("Corrupted pickle file")
+        
+        # Test
+        result = load_from_cache("unpickling_error_key")
+        
+        # Verify result
+        assert result is None
+    
+    @patch('os.path.exists')
+    @patch('builtins.open', new_callable=mock_open)
+    def test_load_from_cache_with_general_exception(
+        self, mock_file: pytest.MonkeyPatch, mock_exists: pytest.MonkeyPatch
+    ) -> None:
+        """Test that load_from_cache handles general exceptions."""
+        # Setup mocks
+        mock_exists.return_value = True
+        mock_file.side_effect = Exception("Unexpected error")
+        
+        # Test
+        result = load_from_cache("exception_key")
+        
+        # Verify result
+        assert result is None

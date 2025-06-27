@@ -51,10 +51,10 @@ The following indexed checklist breaks the original PRD into very small, code-re
   - [x] Unit test: Test successful save
   - [x] Unit test: Test with invalid inputs
   - [x] Unit test: Test with file system errors
-- [ ] 2.2.2 `load_from_cache(key) -> DataFrame | None`
-  - [ ] Unit test: Test successful load
-  - [ ] Unit test: Test with non-existent key
-  - [ ] Unit test: Test with corrupted cache file
+- [x] 2.2.2 `load_from_cache(key) -> DataFrame | None`
+  - [x] Unit test: Test successful load
+  - [x] Unit test: Test with non-existent key
+  - [x] Unit test: Test with corrupted cache file
 - [ ] 2.2.3 `is_cache_stale(key, minutes) -> bool`
   - [ ] Unit test: Test with fresh cache
   - [ ] Unit test: Test with stale cache
@@ -221,4 +221,3 @@ The following indexed checklist breaks the original PRD into very small, code-re
 - [ ] 16.3 Write user guide (screenshots)
 
 ---
-Use the smallest possible PRs and tick tasks as you complete them. Good luck!

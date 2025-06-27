@@ -76,9 +76,55 @@ def load_from_cache(key: str) -> Optional[pd.DataFrame]:
     
     Returns:
         DataFrame if cache exists and is valid, None otherwise.
+        
+    Raises:
+        ValueError: If key is empty or invalid.
     """
-    # Placeholder implementation
-    pass
+    import logging
+    
+    # Configure logging
+    logger = logging.getLogger(__name__)
+    
+    # Validate input
+    if not isinstance(key, str) or not key.strip():
+        logger.error("Invalid key: key must be a non-empty string")
+        raise ValueError("Key must be a non-empty string")
+    
+    # Sanitize key for filename
+    safe_key = ''.join(c if c.isalnum() else '_' for c in key)
+    
+    # Get cache path
+    cache_dir = os.path.join(os.path.dirname(__file__), '..', 'cache')
+    cache_path = os.path.join(cache_dir, f"{safe_key}.pkl")
+    
+    # Check if cache file exists
+    if not os.path.exists(cache_path):
+        logger.info(f"No cache found for key '{key}'")
+        return None
+    
+    try:
+        # Load from pickle file
+        with open(cache_path, 'rb') as f:
+            cache_data = pickle.load(f)
+        
+        # Verify cache data structure
+        if not isinstance(cache_data, dict) or 'data' not in cache_data or 'timestamp' not in cache_data:
+            logger.warning(f"Corrupted cache for key '{key}': invalid structure")
+            return None
+        
+        # Verify DataFrame
+        if not isinstance(cache_data['data'], pd.DataFrame):
+            logger.warning(f"Corrupted cache for key '{key}': data is not a DataFrame")
+            return None
+            
+        logger.info(f"Successfully loaded cached data for key '{key}'")
+        return cache_data['data']
+    except (pickle.UnpicklingError, EOFError) as e:
+        logger.warning(f"Corrupted cache file for key '{key}': {str(e)}")
+        return None
+    except Exception as e:
+        logger.error(f"Error loading data from cache for key '{key}': {str(e)}")
+        return None
 
 
 def is_cache_stale(key: str, minutes: int = 60) -> bool:
