@@ -7,7 +7,7 @@ import pandas as pd
 import numpy as np
 from typing import TYPE_CHECKING
 
-from data.preprocess import impute_missing
+from data.preprocess import impute_missing, scale_numeric
 
 if TYPE_CHECKING:
     from _pytest.capture import CaptureFixture
@@ -152,3 +152,93 @@ class TestImputeMissing:
         # Only rows without NaN values should remain
         assert len(result) == 3  # Based on actual function behavior
         assert not result.isna().any().any()  # No NaN values should remain
+
+
+class TestScaleNumeric:
+    """Tests for the scale_numeric function."""
+    
+    def test_scale_numeric_with_invalid_df_type(self) -> None:
+        """Test that scale_numeric raises TypeError for invalid DataFrame type."""
+        with pytest.raises(TypeError, match="df must be a pandas DataFrame"):
+            scale_numeric([1, 2, 3])  # type: ignore
+        
+        with pytest.raises(TypeError, match="df must be a pandas DataFrame"):
+            scale_numeric({"a": 1, "b": 2})  # type: ignore
+    
+    def test_scale_numeric_with_numeric_columns(self) -> None:
+        """Test that scale_numeric correctly scales numeric columns."""
+        # Create test DataFrame with numeric columns
+        df = pd.DataFrame({
+            'A': [1.0, 2.0, 3.0, 4.0],
+            'B': [10.0, 20.0, 30.0, 40.0]
+        })
+        
+        # Call function
+        result = scale_numeric(df)
+        
+        # Verify result - each column should have mean=0 and std=1
+        assert result.shape == df.shape  # Same shape as input
+        assert abs(result['A'].mean()) < 0.2  # Mean should be close to 0 (with tolerance)
+        assert abs(result['B'].mean()) < 0.2  # Mean should be close to 0 (with tolerance)
+        assert abs(result['A'].std() - 1.0) < 0.2  # Std should be close to 1 (with tolerance)
+        assert abs(result['B'].std() - 1.0) < 0.2  # Std should be close to 1 (with tolerance)
+    
+    def test_scale_numeric_with_mixed_columns(self) -> None:
+        """Test that scale_numeric only scales numeric columns and leaves others unchanged."""
+        # Create test DataFrame with mixed column types
+        df = pd.DataFrame({
+            'A': [1.0, 2.0, 3.0, 4.0],  # Numeric
+            'B': ['a', 'b', 'c', 'd']    # String
+        })
+        
+        # Store original string column for comparison
+        original_col_B = df['B'].copy()
+        
+        # Call function
+        result = scale_numeric(df)
+        
+        # Verify numeric column was scaled
+        assert abs(result['A'].mean()) < 0.2  # Mean should be close to 0 (with tolerance)
+        assert abs(result['A'].std() - 1.0) < 0.2  # Std should be close to 1 (with tolerance)
+        
+        # Verify non-numeric column was left unchanged
+        pd.testing.assert_series_equal(result['B'], original_col_B)
+    
+    def test_scale_numeric_with_empty_dataframe(self) -> None:
+        """Test that scale_numeric raises ValueError for empty DataFrame."""
+        # Create empty DataFrame
+        df = pd.DataFrame()
+        
+        # Test with empty DataFrame
+        with pytest.raises(ValueError, match="No numeric columns found for scaling"):
+            scale_numeric(df)
+    
+    def test_scale_numeric_with_no_numeric_columns(self) -> None:
+        """Test that scale_numeric raises ValueError when no numeric columns."""
+        # Create DataFrame with only non-numeric columns
+        df = pd.DataFrame({
+            'A': ['a', 'b', 'c', 'd'],
+            'B': ['e', 'f', 'g', 'h']
+        })
+        
+        # Test with no numeric columns
+        with pytest.raises(ValueError, match="No numeric columns found for scaling"):
+            scale_numeric(df)
+    
+    def test_scale_numeric_with_constant_column(self) -> None:
+        """Test that scale_numeric handles constant columns (std=0) gracefully."""
+        # Create DataFrame with a constant column
+        df = pd.DataFrame({
+            'A': [1.0, 2.0, 3.0, 4.0],  # Normal column
+            'B': [5.0, 5.0, 5.0, 5.0]    # Constant column
+        })
+        
+        # Call function
+        result = scale_numeric(df)
+        
+        # Verify normal column was scaled correctly
+        assert abs(result['A'].mean()) < 0.2  # Mean should be close to 0 (with tolerance)
+        assert abs(result['A'].std() - 1.0) < 0.2  # Std should be close to 1 (with tolerance)
+        
+        # Verify constant column has zeros (sklearn's StandardScaler behavior)
+        assert (result['B'] == 0).all()  # All values should be 0

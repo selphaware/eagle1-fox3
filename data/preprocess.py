@@ -93,16 +93,61 @@ def impute_missing(df: pd.DataFrame, method: Literal["mean", "median", "drop"] =
 
 def scale_numeric(df: pd.DataFrame) -> pd.DataFrame:
     """
-    Scale numeric columns to have mean=0 and std=1.
+    Scale numeric columns to have mean=0 and std=1 using StandardScaler.
     
     Args:
         df: Input DataFrame with numeric columns.
     
     Returns:
-        DataFrame with scaled numeric columns.
+        DataFrame with scaled numeric columns. Non-numeric columns are left unchanged.
+        
+    Raises:
+        TypeError: If df is not a pandas DataFrame.
+        ValueError: If there are no numeric columns to scale.
     """
-    # Placeholder implementation
-    pass
+    import logging
+    
+    # Configure logging
+    logger = logging.getLogger(__name__)
+    
+    # Validate inputs
+    if not isinstance(df, pd.DataFrame):
+        logger.error("TypeError: df must be a pandas DataFrame")
+        raise TypeError("df must be a pandas DataFrame")
+    
+    # Create a copy to avoid modifying the original DataFrame
+    result_df = df.copy()
+    
+    # Identify numeric columns
+    numeric_cols = result_df.select_dtypes(include=['number']).columns.tolist()
+    
+    # Check if there are any numeric columns
+    if not numeric_cols:
+        logger.error("ValueError: No numeric columns found for scaling")
+        raise ValueError("No numeric columns found for scaling")
+    
+    # Log the columns that will be scaled
+    logger.info(f"Scaling {len(numeric_cols)} numeric columns: {numeric_cols}")
+    
+    # Create scaler
+    scaler = StandardScaler()
+    
+    # Scale numeric columns
+    result_df[numeric_cols] = pd.DataFrame(
+        scaler.fit_transform(result_df[numeric_cols]),
+        columns=numeric_cols,
+        index=result_df.index
+    )
+    
+    # Log scaling results
+    for col in numeric_cols:
+        mean = result_df[col].mean()
+        std = result_df[col].std()
+        logger.debug(f"Column {col} scaled: mean={mean:.6f}, std={std:.6f}")
+    
+    logger.info("Successfully scaled numeric columns")
+    
+    return result_df
 
 
 def encode_categorical(df: pd.DataFrame) -> pd.DataFrame:

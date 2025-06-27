@@ -66,10 +66,10 @@ The following indexed checklist breaks the original PRD into very small, code-re
   - [x] Unit test: Test median imputation
   - [x] Unit test: Test drop imputation
   - [x] Unit test: Test with no missing values
-- [ ] 3.2 `scale_numeric(df)`
-  - [ ] Unit test: Test with numeric columns
-  - [ ] Unit test: Test with mixed columns
-  - [ ] Unit test: Test with empty DataFrame
+- [x] 3.2 `scale_numeric(df)`
+  - [x] Unit test: Test with numeric columns
+  - [x] Unit test: Test with mixed columns
+  - [x] Unit test: Test with empty DataFrame
 - [ ] 3.3 `encode_categorical(df)`
   - [ ] Unit test: Test with categorical columns
   - [ ] Unit test: Test with mixed columns
