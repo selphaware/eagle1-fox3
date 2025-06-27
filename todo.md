@@ -76,10 +76,10 @@ The following indexed checklist breaks the original PRD into very small, code-re
   - [x] Unit test: Test with empty DataFrame
 
 ## 4. ML Helpers (`ml/base.py`)
-- [ ] 4.1 `split_data(df, target, test_size=0.2)`
-  - [ ] Unit test: Test with valid inputs
-  - [ ] Unit test: Test with different test sizes
-  - [ ] Unit test: Test with stratification
+- [x] 4.1 `split_data(df, target, test_size=0.2)`
+  - [x] Unit test: Test with valid inputs
+  - [x] Unit test: Test with different test sizes
+  - [x] Unit test: Test with stratification
 - [ ] 4.2 Metric helper functions
   - [ ] Unit test: Test classification metrics
   - [ ] Unit test: Test regression metrics
