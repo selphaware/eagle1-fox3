@@ -50,6 +50,10 @@ def get_feature_importance(
     if not all(isinstance(name, str) for name in feature_names):
         logger.error("TypeError: All elements in feature_names must be strings")
         raise TypeError("All elements in feature_names must be strings")
+        
+    if len(feature_names) == 0:
+        logger.error("ValueError: feature_names cannot be empty")
+        raise ValueError("feature_names cannot be empty")
     
     # Initialize importance array
     importance = None
@@ -106,6 +110,10 @@ def get_feature_importance(
                         f"does not match length of feature_names ({len(feature_names)})")
             raise ValueError(f"Number of features in model ({importance_len}) "
                             f"does not match length of feature_names ({len(feature_names)})")
+            
+        # Ensure importance is a numpy array for consistent handling
+        if not isinstance(importance, np.ndarray):
+            importance = np.array(importance)
         
         # Create DataFrame with feature names and importance scores
         importance_df = pd.DataFrame({
@@ -123,4 +131,5 @@ def get_feature_importance(
     
     except Exception as e:
         logger.error(f"Error extracting feature importance: {str(e)}")
-        raise
+        # Re-raise with more context
+        raise ValueError(f"Failed to extract feature importance: {str(e)}") from e
