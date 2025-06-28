@@ -261,8 +261,9 @@ class TestRegressionMetrics:
         assert metrics['mse'] == 0.0
         assert metrics['rmse'] == 0.0
         assert metrics['mae'] == 0.0
-        # For single values, R² and explained variance may be undefined (NaN)
-        # Skip these assertions
+        # For single values, R² and explained variance should be NaN
+        assert np.isnan(metrics['r2'])
+        assert np.isnan(metrics['explained_variance'])
         
         # Edge case 3: Constant true values (division by zero in R²)
         y_true = [5.0, 5.0, 5.0, 5.0, 5.0]

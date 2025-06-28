@@ -121,7 +121,7 @@ def classification_metrics(
 def regression_metrics(
     y_true: Union[List, np.ndarray, pd.Series],
     y_pred: Union[List, np.ndarray, pd.Series]
-) -> Dict[str, float]:
+) -> Dict[str, Union[float, str]]:
     """
     Calculate regression metrics for model evaluation.
 
@@ -170,13 +170,21 @@ def regression_metrics(
         metrics['mse'] = float(mse)
         metrics['rmse'] = float(np.sqrt(mse))
         metrics['mae'] = float(mean_absolute_error(y_true_array, y_pred_array))
-        metrics['r2'] = float(r2_score(y_true_array, y_pred_array))
-        metrics['explained_variance'] = float(explained_variance_score(y_true_array, y_pred_array))
+        
+        # Handle R² and explained variance for single sample case
+        if len(y_true_array) < 2:
+            logger.warning("R² and explained variance are not well-defined with less than two samples. "
+                          "Setting these metrics to NaN.")
+            metrics['r2'] = float('nan')
+            metrics['explained_variance'] = float('nan')
+        else:
+            metrics['r2'] = float(r2_score(y_true_array, y_pred_array))
+            metrics['explained_variance'] = float(explained_variance_score(y_true_array, y_pred_array))
         
         # Log metrics
         logger.info(f"Regression metrics calculated: mse={metrics['mse']:.4f}, "
                    f"rmse={metrics['rmse']:.4f}, mae={metrics['mae']:.4f}, "
-                   f"r2={metrics['r2']:.4f}")
+                   f"r2={metrics.get('r2', 'nan')}")
         
     except Exception as e:
         logger.error(f"Error calculating regression metrics: {str(e)}")
