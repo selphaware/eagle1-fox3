@@ -108,10 +108,10 @@ class TestFeatureImportance:
         y = np.array([0, 1, 0, 1])
         
         # Create a base estimator
-        base_estimator = DecisionTreeClassifier(max_depth=1)
+        tree_estimator = DecisionTreeClassifier(max_depth=1)
         
-        # Train an AdaBoost ensemble model
-        model = AdaBoostClassifier(base_estimator=base_estimator, n_estimators=3, random_state=42)
+        # Train an AdaBoost ensemble model using 'estimator' parameter instead of deprecated 'base_estimator'
+        model = AdaBoostClassifier(estimator=tree_estimator, n_estimators=3, random_state=42)
         model.fit(X, y)
         
         feature_names = ["feature1", "feature2", "feature3"]
