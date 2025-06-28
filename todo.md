@@ -99,10 +99,10 @@ This document outlines the tasks for implementing a financial data analysis appl
   - [x] Unit test: Test model training
   - [x] Unit test: Test model prediction
   - [x] Unit test: Test model evaluation
-- [ ] 5.2 Random Forest Classifier
-  - [ ] Unit test: Test model training
-  - [ ] Unit test: Test model prediction
-  - [ ] Unit test: Test feature importance
+- [x] 5.2 Random Forest Classifier
+  - [x] Unit test: Test model training
+  - [x] Unit test: Test model prediction
+  - [x] Unit test: Test feature importance
 - [ ] 5.3 TensorFlow DNN Classifier
   - [ ] Unit test: Test model architecture
   - [ ] Unit test: Test model training
