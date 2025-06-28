@@ -8,7 +8,9 @@ for financial data analysis.
 __author__ = "Usman Ahmad"
 
 from ml.regression.linear_regression import LinearRegressionModel
+from ml.regression.random_forest import RandomForestRegressionModel
 
 __all__ = [
     'LinearRegressionModel',
+    'RandomForestRegressionModel',
 ]

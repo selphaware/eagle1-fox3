@@ -2,7 +2,9 @@
 
 from typing import List
 from ml.regression import LinearRegressionModel
+from ml.regression import RandomForestRegressionModel
 
 __all__: List[str] = [
     'LinearRegressionModel',
+    'RandomForestRegressionModel',
 ]
