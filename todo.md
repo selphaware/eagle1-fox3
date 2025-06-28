@@ -1,6 +1,15 @@
-# Financial Data Analysis TODO (Indexed)
+# Financial Data Analysis App
 
-The following indexed checklist breaks the original PRD into very small, code-ready tasks. Mark each item when complete.
+This document outlines the tasks for implementing a financial data analysis application.
+
+## Modularization Guidelines
+
+- Each class should be implemented in its own dedicated file
+- Use subdirectories to organize related functionality (e.g., ml/classification/, ml/regression/)
+- Create proper __init__.py files to expose classes and functions
+- Avoid having multiple classes in a single script
+- Break down functionality into smaller, more manageable components
+- Follow consistent import patterns through base.py files
 
 ## 0. Environment
 - [x] 0.1 Activate existing virtual environment `env_eaglefox` (Python 3.10.13)
