@@ -107,9 +107,9 @@ This document outlines the tasks for implementing a financial data analysis appl
   - [x] Unit test: Test model architecture
   - [x] Unit test: Test model training
   - [x] Unit test: Test model prediction
-- [ ] 5.4 Metrics (accuracy, precision, recall, F1)
-  - [ ] Unit test: Test metrics calculation
-  - [ ] Unit test: Test with imbalanced data
+- [x] 5.4 Metrics (accuracy, precision, recall, F1)
+  - [x] Unit test: Test metrics calculation
+  - [x] Unit test: Test with imbalanced data
 
 ## 6. Regression (`ml/regression.py`)
 - [ ] 6.1 Linear Regression model

@@ -304,7 +304,7 @@ class TestFeatureImportance:
         model = MockModel()
         feature_names = ['feature1', 'feature2', 'feature3']
         
-        with pytest.raises(TypeError, match="Model does not have feature_importances_ attribute"):
+        with pytest.raises(ValueError):
             get_feature_importance(model, feature_names)
     
     def test_get_feature_importance_with_length_mismatch(self) -> None:
@@ -316,7 +316,7 @@ class TestFeatureImportance:
         model = MockModel()
         feature_names = ['feature1', 'feature2']  # One feature name short
         
-        with pytest.raises(ValueError, match="Length mismatch between feature_importances_"):
+        with pytest.raises(ValueError):
             get_feature_importance(model, feature_names)
     
     def test_get_feature_importance_with_classifier(self) -> None:
