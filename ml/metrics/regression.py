@@ -114,10 +114,16 @@ def regression_metrics(
             if std_dev > 0:
                 metrics['rmse_to_stdev'] = float(metrics['rmse'] / std_dev)
             else:
-                logger.warning("rmse_to_stdev not calculated: standard deviation is zero")
-                metrics['rmse_to_stdev'] = float('nan')
+                # For perfect predictions or constant targets, set rmse_to_stdev to 0
+                # This is more intuitive than NaN for perfect predictions
+                logger.warning("rmse_to_stdev set to 0: standard deviation is zero")
+                metrics['rmse_to_stdev'] = 0.0
         else:
-            metrics['rmse_to_stdev'] = float('nan')
+            # For single sample, set rmse_to_stdev to 0 if rmse is 0, otherwise NaN
+            if metrics['rmse'] == 0:
+                metrics['rmse_to_stdev'] = 0.0
+            else:
+                metrics['rmse_to_stdev'] = float('nan')
         
         # Log metrics
         logger.info(f"Regression metrics calculated: mse={metrics['mse']:.4f}, "

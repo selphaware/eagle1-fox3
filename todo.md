@@ -112,10 +112,10 @@ This document outlines the tasks for implementing a financial data analysis appl
   - [x] Unit test: Test with imbalanced data
 
 ## 6. Regression (`ml/regression.py`)
-- [ ] 6.1 Linear Regression model
-  - [ ] Unit test: Test model training
-  - [ ] Unit test: Test model prediction
-  - [ ] Unit test: Test model coefficients
+- [x] 6.1 Linear Regression model
+  - [x] Unit test: Test model training
+  - [x] Unit test: Test model prediction
+  - [x] Unit test: Test model coefficients
 - [ ] 6.2 Random Forest Regressor
   - [ ] Unit test: Test model training
   - [ ] Unit test: Test model prediction
