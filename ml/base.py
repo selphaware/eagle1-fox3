@@ -19,7 +19,7 @@ from ml.metrics import (
     regression_metrics,
     get_feature_importance
 )
-from ml.classification import LogisticRegressionModel, RandomForestClassifier
+from ml.classification import LogisticRegressionModel, RandomForestClassifier, DNNClassifier
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -31,5 +31,6 @@ __all__ = [
     'regression_metrics',
     'get_feature_importance',
     'LogisticRegressionModel',
-    'RandomForestClassifier'
+    'RandomForestClassifier',
+    'DNNClassifier'
 ]

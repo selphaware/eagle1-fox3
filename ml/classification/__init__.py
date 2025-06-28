@@ -9,8 +9,10 @@ __author__ = "Usman Ahmad"
 
 from ml.classification.logistic_regression import LogisticRegressionModel
 from ml.classification.random_forest import RandomForestClassifier
+from ml.classification.tensorflow.dnn_classifier import DNNClassifier
 
 __all__ = [
     'LogisticRegressionModel',
-    'RandomForestClassifier'
+    'RandomForestClassifier',
+    'DNNClassifier'
 ]

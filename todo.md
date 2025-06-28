@@ -103,10 +103,10 @@ This document outlines the tasks for implementing a financial data analysis appl
   - [x] Unit test: Test model training
   - [x] Unit test: Test model prediction
   - [x] Unit test: Test feature importance
-- [ ] 5.3 TensorFlow DNN Classifier
-  - [ ] Unit test: Test model architecture
-  - [ ] Unit test: Test model training
-  - [ ] Unit test: Test model prediction
+- [x] 5.3 TensorFlow DNN Classifier
+  - [x] Unit test: Test model architecture
+  - [x] Unit test: Test model training
+  - [x] Unit test: Test model prediction
 - [ ] 5.4 Metrics (accuracy, precision, recall, F1)
   - [ ] Unit test: Test metrics calculation
   - [ ] Unit test: Test with imbalanced data
