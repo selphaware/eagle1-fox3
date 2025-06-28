@@ -120,10 +120,10 @@ This document outlines the tasks for implementing a financial data analysis appl
   - [x] Unit test: Test model training
   - [x] Unit test: Test model prediction
   - [x] Unit test: Test feature importance
-- [ ] 6.3 TensorFlow DNN Regressor
-  - [ ] Unit test: Test model architecture
-  - [ ] Unit test: Test model training
-  - [ ] Unit test: Test model prediction
+- [x] 6.3 TensorFlow DNN Regressor
+  - [x] Unit test: Test model architecture
+  - [x] Unit test: Test model training
+  - [x] Unit test: Test model prediction
 - [ ] 6.4 Metrics (MSE, RMSE, MAE, R²)
   - [ ] Unit test: Test metrics calculation
   - [ ] Unit test: Test with different data distributions
