@@ -147,7 +147,8 @@ class TestRegressionMetrics:
         assert metrics['max_error'] > 0.0
         # MAPE might be NaN if there are zeros in y_true
         assert metrics['mape'] > 0.0 or np.isnan(metrics['mape'])
-        assert np.isnan(metrics['rmse_to_stdev'])  # Std = 0 for constant y_true
+        # For constant true values, rmse_to_stdev is now set to 0.0 instead of NaN
+        assert np.isclose(metrics['rmse_to_stdev'], 0.0, atol=1e-10)
 
     def test_extremely_large_values(self) -> None:
         """Test metrics with extremely large values."""
