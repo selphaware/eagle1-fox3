@@ -137,11 +137,11 @@ This document outlines the tasks for implementing a financial data analysis appl
   - [x] Unit test: Test input validation and error handling
   - [x] Unit test: Test logging behavior
 
-## 7. Unsupervised Learning (`ml/unsupervised.py`)
-- [ ] 7.1 K-Means Clustering
-  - [ ] Unit test: Test clustering
-  - [ ] Unit test: Test optimal k selection
-  - [ ] Unit test: Test with different initializations
+## 7. Unsupervised Learning (`ml/unsupervised/`)
+- [x] 7.1 K-Means Clustering
+  - [x] Unit test: Test clustering
+  - [x] Unit test: Test optimal k selection
+  - [x] Unit test: Test with different initializations
 - [ ] 7.2 PCA
   - [ ] Unit test: Test dimensionality reduction
   - [ ] Unit test: Test explained variance

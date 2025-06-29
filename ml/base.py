@@ -44,6 +44,7 @@ from ml.classification import LogisticRegressionModel, RandomForestClassifier, D
 from ml.regression.linear_regression import LinearRegressionModel
 from ml.regression.random_forest import RandomForestRegressionModel
 from ml.regression.tensorflow_dnn import TensorFlowDNNRegressor
+from ml.unsupervised.kmeans import KMeansModel
 
 # Configure logging
 logger = logging.getLogger(__name__)
