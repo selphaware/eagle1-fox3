@@ -40,6 +40,11 @@ from ml.metrics import (
 # Import classification models
 from ml.classification import LogisticRegressionModel, RandomForestClassifier, DNNClassifier
 
+# Import regression models
+from ml.regression.linear_regression import LinearRegressionModel
+from ml.regression.random_forest import RandomForestRegressionModel
+from ml.regression.tensorflow_dnn import TensorFlowDNNRegressor
+
 # Configure logging
 logger = logging.getLogger(__name__)
 
@@ -55,6 +60,11 @@ __all__ = [
     'precision_recall_curve_data',
     'roc_curve_data',
     'classification_report_dict',
+    
+    # Regression models
+    'LinearRegressionModel',
+    'RandomForestRegressionModel',
+    'TensorFlowDNNRegressor',
     
     # Regression metrics
     'regression_metrics',

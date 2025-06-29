@@ -182,6 +182,105 @@ class LinearRegressionModel:
             logger.error(f"Error making predictions: {str(e)}")
             raise
     
+    def predict_n_steps_ahead(
+        self,
+        X: Union[pd.DataFrame, np.ndarray],
+        n_steps: int,
+        feature_update_func: Optional[callable] = None
+    ) -> np.ndarray:
+        """
+        Make predictions for n steps ahead using recursive forecasting.
+        
+        This method predicts multiple steps into the future by recursively using
+        previous predictions as inputs for subsequent predictions. It's particularly
+        useful for time series forecasting.
+        
+        Args:
+            X: Initial features to predict on (typically the last known data point).
+            n_steps: Number of steps to predict ahead.
+            feature_update_func: Optional function that takes (features, prediction, step_index)
+                                and returns updated features for the next prediction step.
+                                If None, a simple shift strategy is used for time series data.
+            
+        Returns:
+            Array of n_steps predictions.
+            
+        Raises:
+            ValueError: If model is not fitted, if X has wrong shape, or if n_steps < 1.
+            TypeError: If X is not a pandas DataFrame or numpy ndarray.
+        """
+        # Check if model is fitted
+        if not self.is_fitted:
+            logger.error("Model must be fitted before making predictions")
+            raise ValueError("Model must be fitted before making predictions")
+        
+        # Validate input
+        if not isinstance(X, (pd.DataFrame, np.ndarray)):
+            logger.error("X must be a pandas DataFrame or numpy ndarray")
+            raise TypeError("X must be a pandas DataFrame or numpy ndarray")
+            
+        if n_steps < 1:
+            logger.error("n_steps must be at least 1")
+            raise ValueError("n_steps must be at least 1")
+        
+        # Convert to numpy array if needed and ensure we have a copy to modify
+        if isinstance(X, pd.DataFrame):
+            features = X.copy()
+            is_dataframe = True
+        else:
+            features = np.copy(X)
+            is_dataframe = False
+            
+        # Prepare storage for predictions
+        predictions = np.zeros(n_steps)
+        
+        logger.info(f"Making {n_steps}-step ahead predictions")
+        
+        try:
+            for i in range(n_steps):
+                # Make single-step prediction
+                current_pred = self.predict(features)
+                predictions[i] = current_pred[0]  # Store the prediction
+                
+                # Update features for next prediction
+                if feature_update_func is not None:
+                    # Use custom function to update features
+                    features = feature_update_func(features, current_pred, i)
+                else:
+                    # Default behavior: shift features and add new prediction as most recent feature
+                    # This assumes time series data where each row is a time step
+                    if is_dataframe:
+                        # For DataFrame, create a new row with properly typed values
+                        # Get column names for clearer indexing
+                        col_names = features.columns.tolist()
+                        
+                        # Create a dictionary with the updated values
+                        new_values = {}
+                        
+                        # Shift values (all except last column)
+                        for i in range(len(col_names) - 1):
+                            new_values[col_names[i]] = features.iloc[0, i+1]
+                            
+                        # Set the last column to the prediction, ensuring proper type conversion
+                        last_col = col_names[-1]
+                        # Convert to the same dtype as the target column
+                        pred_value = np.array([current_pred[0]]).astype(features[last_col].dtype)[0]
+                        new_values[last_col] = pred_value
+                        
+                        # Update the DataFrame row with the new values
+                        for col, val in new_values.items():
+                            features.loc[0, col] = val
+                    else:
+                        # For numpy array, shift values and update the last column
+                        features[0, :-1] = features[0, 1:]
+                        features[0, -1] = current_pred[0]
+            
+            logger.info(f"{n_steps}-step ahead predictions generated successfully")
+            return predictions
+        except Exception as e:
+            logger.error(f"Error making n-step ahead predictions: {str(e)}")
+            raise
+    
     def evaluate(
         self,
         X: Union[pd.DataFrame, np.ndarray],
