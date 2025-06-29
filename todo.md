@@ -127,6 +127,15 @@ This document outlines the tasks for implementing a financial data analysis appl
 - [x] 6.4 Metrics (MSE, RMSE, MAE, R²)
   - [x] Unit test: Test metrics calculation
   - [x] Unit test: Test with different data distributions
+- [x] 6.5 N-Step Ahead Prediction
+  - [x] Implement predict_n_steps_ahead in LinearRegressionModel
+  - [x] Implement predict_n_steps_ahead in RandomForestRegressionModel
+  - [x] Implement predict_n_steps_ahead in TensorFlowDNNRegressor
+  - [x] Support custom feature update functions
+  - [x] Unit test: Test basic functionality for all models
+  - [x] Unit test: Test with custom feature update function
+  - [x] Unit test: Test input validation and error handling
+  - [x] Unit test: Test logging behavior
 
 ## 7. Unsupervised Learning (`ml/unsupervised.py`)
 - [ ] 7.1 K-Means Clustering
