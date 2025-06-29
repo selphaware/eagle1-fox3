@@ -2,19 +2,30 @@
 Base metrics utilities for machine learning models.
 
 This module provides core functions for calculating various performance metrics
-for classification and regression models.
+for classification and regression models, as well as advanced metrics and
+visualization utilities.
 """
 
 __author__ = "Usman Ahmad"
 
-from typing import Dict, List, Union, Optional, Tuple, Any, cast
+from typing import Dict, List, Union, Optional, Tuple, Any, cast, Callable
 import numpy as np
 import pandas as pd
 from sklearn.metrics import (
     accuracy_score, precision_score, recall_score, f1_score,
-    roc_auc_score, confusion_matrix, classification_report
+    roc_auc_score, confusion_matrix, classification_report,
+    mean_squared_error, mean_absolute_error, r2_score,
+    explained_variance_score, median_absolute_error,
+    mean_absolute_percentage_error, max_error,
+    mean_squared_log_error, mean_poisson_deviance,
+    mean_gamma_deviance, mean_tweedie_deviance,
+    d2_tweedie_score, d2_absolute_error_score,
+    d2_pinball_score
 )
 import logging
+import matplotlib.pyplot as plt
+from matplotlib.figure import Figure
+import seaborn as sns
 
 # Configure logging
 logger = logging.getLogger(__name__)

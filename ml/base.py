@@ -24,7 +24,17 @@ from ml.metrics import (
     roc_curve_data,
     classification_report_dict,
     regression_metrics,
-    get_feature_importance
+    get_feature_importance,
+    # Advanced regression metrics
+    advanced_regression_metrics,
+    regression_metrics_by_group,
+    confidence_interval_metrics,
+    # Visualization functions
+    plot_residuals,
+    plot_actual_vs_predicted,
+    plot_prediction_error_distribution,
+    plot_metrics_comparison,
+    plot_prediction_intervals
 )
 
 # Import classification models
@@ -48,6 +58,16 @@ __all__ = [
     
     # Regression metrics
     'regression_metrics',
+    'advanced_regression_metrics',
+    'regression_metrics_by_group',
+    'confidence_interval_metrics',
+    
+    # Visualization functions
+    'plot_residuals',
+    'plot_actual_vs_predicted',
+    'plot_prediction_error_distribution',
+    'plot_metrics_comparison',
+    'plot_prediction_intervals',
     
     # Feature importance
     'get_feature_importance',

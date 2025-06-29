@@ -124,9 +124,9 @@ This document outlines the tasks for implementing a financial data analysis appl
   - [x] Unit test: Test model architecture
   - [x] Unit test: Test model training
   - [x] Unit test: Test model prediction
-- [ ] 6.4 Metrics (MSE, RMSE, MAE, R²)
-  - [ ] Unit test: Test metrics calculation
-  - [ ] Unit test: Test with different data distributions
+- [x] 6.4 Metrics (MSE, RMSE, MAE, R²)
+  - [x] Unit test: Test metrics calculation
+  - [x] Unit test: Test with different data distributions
 
 ## 7. Unsupervised Learning (`ml/unsupervised.py`)
 - [ ] 7.1 K-Means Clustering
