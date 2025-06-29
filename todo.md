@@ -142,13 +142,13 @@ This document outlines the tasks for implementing a financial data analysis appl
   - [x] Unit test: Test clustering
   - [x] Unit test: Test optimal k selection
   - [x] Unit test: Test with different initializations
-- [ ] 7.2 PCA
-  - [ ] Unit test: Test dimensionality reduction
-  - [ ] Unit test: Test explained variance
-  - [ ] Unit test: Test with standardized data
-- [ ] 7.3 Metrics (silhouette score, explained variance)
-  - [ ] Unit test: Test metrics calculation
-  - [ ] Unit test: Test with different cluster shapes
+- [x] 7.2 PCA
+  - [x] Unit test: Test dimensionality reduction
+  - [x] Unit test: Test explained variance
+  - [x] Unit test: Test with standardized data
+- [x] 7.3 Metrics (silhouette score, explained variance)
+  - [x] Unit test: Test metrics calculation
+  - [x] Unit test: Test with different cluster shapes
 
 ## 8. Frontend Components (`frontend/components.py`)
 - [ ] 8.1 Data table with conditional formatting
